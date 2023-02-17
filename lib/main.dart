@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import 'provider.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(create: (context) => SwitchProvider(), child: const MyApp(),));
+  runApp(ChangeNotifierProvider(
+    create: (context) => SwitchProvider(20), // Count of switches provided
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,53 +21,62 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         useMaterial3: true,
+          brightness: Brightness.dark,
         colorSchemeSeed: Colors.greenAccent
       ),
-      home: const MySwitches(),
+      home: const MySwitches(
+        numSubSwitches: 20, // Count of switches provided
+      ),
     );
   }
 }
 
 class MySwitches extends StatelessWidget {
-  const MySwitches({super.key});
+  final int numSubSwitches;
+  const MySwitches({
+    Key? key,
+    required this.numSubSwitches,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SwitchProvider>(
       builder: (context, model, child) {
+        List<Widget> subSwitchListTiles = [];
+        for (int i = 0; i < numSubSwitches; i++) {
+          subSwitchListTiles.add(
+            SwitchListTile(
+              title: Text('Sub Switch ${i + 1}'),
+              value: model.subSwitchValues[i],
+              onChanged: (bool value) {
+                List<bool> subSwitchValues = List.from(model.subSwitchValues);
+                subSwitchValues[i] = value;
+                model.subSwitchValues = subSwitchValues;
+              },
+            ),
+          );
+        }
         return Scaffold(
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SwitchListTile(
-                title: const Text('Master Switch'),
-                value: model.masterSwitchValue,
-                onChanged: (bool value) {
-                  model.masterSwitchValue = value;
-                },
+          appBar: AppBar(
+            title: const Text("Switch Test"),
+          ),
+          extendBodyBehindAppBar: true,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SwitchListTile(
+                    title: const Text('Master Switch'),
+                    value: model.masterSwitchValue,
+                    onChanged: (bool value) {
+                      model.masterSwitchValue = value;
+                    },
+                  ),
+                  ...subSwitchListTiles,
+                ],
               ),
-              SwitchListTile(
-                title: const Text('Sub Switch 1'),
-                value: model.subSwitch1Value,
-                onChanged: (bool value) {
-                  model.subSwitch1Value = value;
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Sub Switch 2'),
-                value: model.subSwitch2Value,
-                onChanged: (bool value) {
-                  model.subSwitch2Value = value;
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Sub Switch 3'),
-                value: model.subSwitch3Value,
-                onChanged: (bool value) {
-                  model.subSwitch3Value = value;
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
