@@ -59,11 +59,19 @@ import 'package:flutter/material.dart';
 
 //* For ANY Number of switches
 
-class SwitchProvider with ChangeNotifier {
+class AllProvider with ChangeNotifier {
   bool _masterSwitchValue = false;
   List<bool> _subSwitchValues = [];
 
-  SwitchProvider(int numSubSwitches) {
+  Color _colorScheme = Colors.red;
+  Color get colorScheme => _colorScheme;
+
+  void updateColorScheme(Color color) {
+    _colorScheme = color;
+    notifyListeners();
+  }
+
+  AllProvider(int numSubSwitches) {
     for (int i = 0; i < numSubSwitches; i++) {
       _subSwitchValues.add(false);
     }
